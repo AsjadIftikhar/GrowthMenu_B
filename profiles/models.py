@@ -37,3 +37,38 @@ class Customer(models.Model):
 
     # Link to default user model
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+
+
+class Admin(models.Model):
+    """Growth Menu Customer Model"""
+
+    # Address
+    address = models.CharField(max_length=255)
+
+    # Link to default user model
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+
+
+class Manager(models.Model):
+    """Growth Menu Customer Model"""
+
+    # Phone Number
+    phone = models.CharField(max_length=255)
+
+    # Website URL
+    website_url = models.URLField()
+
+    # Address
+    address = models.CharField(max_length=255)
+
+    # Link to default user model
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
