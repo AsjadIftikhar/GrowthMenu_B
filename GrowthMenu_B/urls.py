@@ -21,5 +21,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
     path('', include('profiles.urls')),
+    path('api/', include('api.urls')),
+    # path('', include('order.urls')),
 
 ]
