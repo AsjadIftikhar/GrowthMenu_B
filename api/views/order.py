@@ -6,6 +6,6 @@ from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveM
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 
-class OrderViewSet(CreateModelMixin, GenericViewSet):
+class OrderViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
