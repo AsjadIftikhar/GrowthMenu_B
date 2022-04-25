@@ -15,7 +15,10 @@ class Order(models.Model):
     category = models.CharField(choices=categories, max_length=255)
     placed_at = models.DateTimeField(auto_now_add=True)
     due_at = models.DateField()
-    requirements = models.CharField(max_length=2000)
-    details = models.CharField(max_length=2000)
+    requirements = models.TextField(max_length=2000)
+    details = models.TextField(max_length=2000)
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "[{}] Order Placed by - {} > due at {}".format(self.category, self.customer, self.due_at)
