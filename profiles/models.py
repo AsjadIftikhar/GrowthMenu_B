@@ -22,7 +22,6 @@ class Customer(models.Model):
         (AM, 'Affiliate Marketing'),
         (TB, 'Tech Business'),
         (OTHER, 'Other'),
-
     ]
     business_category = models.CharField(choices=CATEGORIES, default=AGENCY, max_length=100)
 
