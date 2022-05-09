@@ -1,6 +1,6 @@
 from django.db import models
 from profiles.models import Customer
-from django.db.models.signals import post_save, post_init
+from django.db.models.signals import pre_save, post_init
 
 
 # Create your models here.
@@ -56,8 +56,8 @@ class Order(models.Model):
 
     # Detect status change
     @staticmethod
-    def post_save(sender, instance, created, **kwargs):
-        if instance.previous_status != instance.status_category or created:
+    def pre_save(sender, instance, **kwargs):
+        if instance.previous_status != instance.status_category:
 
             # ACTIVE
             active_status_types = ['In Progress', 'Awaiting Brief', 'In Revision']
@@ -69,22 +69,16 @@ class Order(models.Model):
             canceled_status_types = ['Refund', 'Canceled']
 
             if instance.status_category in active_status_types:
-                instance.active = True
-                instance.completed = False
-                instance.canceled = False
-            if instance.status_category in completed_status_types:
-                instance.active = False
-                instance.completed = True
-                instance.canceled = False
-            if instance.status_category in canceled_status_types:
-                instance.active = False
-                instance.completed = False
-                instance.canceled = True
+                instance.overall_status_category = 'Active'
+            elif instance.status_category in completed_status_types:
+                instance.overall_status_category = 'Completed'
+            elif instance.status_category in canceled_status_types:
+                instance.overall_status_category = 'Canceled'
 
     @staticmethod
     def remember_state(sender, instance, **kwargs):
-        instance.previous_state = instance.state
+        instance.previous_status = instance.status_category
 
 
-post_save.connect(Order.post_save, sender=Order)
+pre_save.connect(Order.pre_save, sender=Order)
 post_init.connect(Order.remember_state, sender=Order)

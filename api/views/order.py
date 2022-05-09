@@ -5,17 +5,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
 
 from profiles.models import Customer
 
 
-class OrderViewSet(ModelViewSet):
-    # permission_classes = [IsAuthenticated]
+class OrderViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
 
-    # def get_queryset(self):
-    #     queryset = Order.objects.filter(customer__user=self.request.user.id)
-    #     print(self.request.user)
-    #     return queryset
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    def order_list(self, request):
+        (customer, created) = Customer.objects.get_or_create(
+                    user_id=request.user.id)
+        queryset = Order.objects.filter(customer=customer)
+        serializer = OrderSerializer(queryset, many=True)
+        return Response(serializer.data)
+
