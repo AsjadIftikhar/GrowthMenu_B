@@ -16,11 +16,17 @@ class OrderViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, Gener
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
 
-    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['GET', 'POST', 'PUT'], permission_classes=[IsAuthenticated])
     def order_list(self, request):
         (customer, created) = Customer.objects.get_or_create(
                     user_id=request.user.id)
         queryset = Order.objects.filter(customer=customer)
-        serializer = OrderSerializer(queryset, many=True)
-        return Response(serializer.data)
+        if request.method == 'GET':
+            serializer = OrderSerializer(queryset, many=True)
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            serializer = OrderSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
