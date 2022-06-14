@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models.order import Order, Cart, Service, ServiceDescription
+from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -23,4 +23,10 @@ class ServiceSerializer(serializers.ModelSerializer):
 class ServiceDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceDescription
+        fields = '__all__'
+
+
+class ServiceRequirementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceRequirement
         fields = '__all__'

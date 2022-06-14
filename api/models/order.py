@@ -87,6 +87,7 @@ class Field(models.Model):
     class Meta:
         abstract = True
 
+
 class TextField(Field):
     text = models.CharField(max_length=1000)
 
@@ -102,10 +103,6 @@ class FileField(Field):
 
 class ImageField(Field):
     upload_image = models.ImageField(upload_to=user_directory_path)
-
-
-
-
 
 
 pre_save.connect(Order.pre_save, sender=Order)

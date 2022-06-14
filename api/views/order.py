@@ -1,5 +1,6 @@
-from api.models.order import Order, Cart, Service, ServiceDescription
-from api.serializers.order import OrderSerializer, CartSerializer, ServiceSerializer, ServiceDescriptionSerializer
+from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement
+from api.serializers.order import OrderSerializer, CartSerializer, ServiceSerializer, ServiceDescriptionSerializer, \
+    ServiceRequirementSerializer
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -8,7 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 
 from profiles.models import Customer
-
 
 
 class OrderViewSet(ModelViewSet):
@@ -30,6 +30,7 @@ class OrderViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
 
 # class OrderViewSet(ModelViewSet):
 #     permission_classes = [IsAuthenticated]
@@ -86,3 +87,9 @@ class ServiceDescriptionViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ServiceDescription.objects.all()
     serializer_class = ServiceDescriptionSerializer
+
+
+class ServiceRequirementViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = ServiceRequirement.objects.all()
+    serializer_class = ServiceRequirementSerializer
