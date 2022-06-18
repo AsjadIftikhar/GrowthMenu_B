@@ -8,9 +8,16 @@ from django.db.models.signals import pre_save, post_init
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
+class Service(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=255)
+    # order = models.ForeignKey(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
+
 
 class Order(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    due_at = models.DateField()
     STATUS = [
         ('In Progress', 'In Progress'),
         ('Awaiting Brief', 'Awaiting Brief'),
@@ -29,6 +36,9 @@ class Order(models.Model):
         ('Canceled', 'Canceled'),
     ]
     overall_status_category = models.CharField(choices=OVERALL_STATUS, default='Active', max_length=100)
+
+    # def __str__(self):
+    #     return "[service {}] Order Placed by - {} > due at {}".format(self.service.pk, self.cart.customer, self.due_at)
 
     # Detect status change
     @staticmethod
@@ -56,19 +66,17 @@ class Order(models.Model):
         instance.previous_status = instance.status_category
 
 
-class Service(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    order = models.ForeignKey(Order, on_delete=models.DO_NOTHING, null=True)
+
 
 
 class ServiceDescription(models.Model):
     service = models.OneToOneField(Service, on_delete=models.CASCADE, related_name="service_description")
-    title = models.CharField(max_length=255)
-    details = models.TextField()
+
+    text = models.TextField()
 
 
 class FAQ(models.Model):
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True)
+    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True, related_name='faq')
     question = models.CharField(max_length=255, null=True)
     answer = models.CharField(max_length=1000, null=True)
 
@@ -78,11 +86,12 @@ class ServiceRequirement(models.Model):
     title = models.CharField(max_length=255)
     details = models.TextField()
     hint = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, null=True)
 
 
 class Field(models.Model):
-    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE)
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE)
+    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True, related_name="%(class)s")
+    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True, related_name="%(class)s")
 
     class Meta:
         abstract = True
