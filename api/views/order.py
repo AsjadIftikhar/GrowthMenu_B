@@ -115,7 +115,7 @@ class ServiceRequirementViewSet(ModelViewSet):
     def get_queryset(self):
         # print(self.kwargs)
         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
-
+    
     def get_serializer_context(self):
         # print(self.kwargs)
         return {'service_id': self.kwargs['service_pk']}
@@ -148,6 +148,11 @@ class RequirementFieldViewSet(ModelViewSet):
         #         return ImageField.objects.filter(service_id=self.kwargs['service_pk'])
 
         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
+
+    # def get_serializer(self, *args, **kwargs):
+    #     serializer_class = self.get_serializer_class()
+    #     kwargs['context'] = self.get_serializer_context()
+    #     return serializer_class(*args, **kwargs)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

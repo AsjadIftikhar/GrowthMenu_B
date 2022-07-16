@@ -25,13 +25,14 @@ class ServiceDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceDescription
         service_id = serializers.IntegerField(read_only=True)
-        fields = ['service_id', 'title', 'text']
+        fields = ['id', 'text']
 
 
 class ServiceSerializer(serializers.ModelSerializer):
+    service_description = ServiceDescriptionSerializer(read_only=True)
     class Meta:
         model = Service
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'service_description']
 
 
 
@@ -57,43 +58,47 @@ class CartSerializer(serializers.ModelSerializer):
 
 class ServiceRequirementSerializer(serializers.ModelSerializer):
 
-    def save(self, **kwargs):
-        print(self.validated_data)
-        service_id = self.context['service_id']
-        text1 = self.validated_data['text']
 
+    class Meta:
+        model = ServiceRequirement
+        fields = ['id', 'title', 'details', 'hint', 'type']
 
-        try:
-            # updating existing Description
-            service_requirement = ServiceRequirement.objects.get(service_id=service_id)
-            service_requirement.title = self.validated_data['title']
-            service_requirement.details = self.validated_data['details']
-            service_requirement.hint = self.validated_data['hint']
-            service_requirement.save()
-            self.instance = service_requirement
-        except ServiceRequirement.DoesNotExist:
-            # Creating new requirement
-            self.instance = ServiceRequirement.objects.create(service_id=service_id, **self.validated_data)
-        #
-        # if self.validated_data['type'] == 'text':
-        #     (text_field, created) = TextField.objects.get_or_create(service_requirement_id=self.instance.pk)
-        #     text_field.text = self.validated_data['text']
-        #     text_field.save()
-        return self.instance
+    # def save(self, **kwargs):
+    #     print(self.validated_data)
+    #     service_id = self.context['service_id']
+    #     text1 = self.validated_data['text']
+    #
+    #
+    #     try:
+    #         # updating existing Description
+    #         service_requirement = ServiceRequirement.objects.get(service_id=service_id)
+    #         service_requirement.title = self.validated_data['title']
+    #         service_requirement.details = self.validated_data['details']
+    #         service_requirement.hint = self.validated_data['hint']
+    #         service_requirement.save()
+    #         self.instance = service_requirement
+    #     except ServiceRequirement.DoesNotExist:
+    #         # Creating new requirement
+    #         self.instance = ServiceRequirement.objects.create(service_id=service_id, **self.validated_data)
+    #
+    #     return self.instance
 
 class TextFieldSerializer(serializers.ModelSerializer):
 
-    # def save(self, **kwargs):
-    #     service_requirement = ServiceRequirement.objects.get(service_id=self.context['service_id'])
-    #     # service_requirement.title = self.validated_data['title']
-    #     # service_requirement.details = self.validated_data['details']
-    #     # service_requirement.hint = self.validated_data['hint']
-    #     # service_requirement.save()
-    #
-    #     text = self.validated_data['text']
-    #
-    #     self.instance = TextField.objects.create(service_requirement=service_requirement.pk, text=text)
-    #     return self.instance
+
+
+    def create(self, validated_data):
+        service_requirement_id = self.context['service_requirement_id']
+        return TextField.objects.create(service_requirement_id=service_requirement_id, text=self.validated_data['text'])
+
+    service_requirement = ServiceRequirementSerializer(read_only=True)
+    class Meta:
+        model = TextField
+
+        fields = ['service_requirement', 'text']
+
+
+class ImageFieldSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         service_requirement_id = self.context['service_requirement_id']
@@ -102,31 +107,13 @@ class TextFieldSerializer(serializers.ModelSerializer):
         # service_requirement.details = self.validated_data['service_requirement']['details']
         # service_requirement.hint = self.validated_data['service_requirement']['hint']
         # service_requirement.type = self.validated_data['service_requirement']['type']
-        return TextField.objects.create(service_requirement_id=service_requirement_id, text=self.validated_data['text'])
+        return ImageField.objects.create(service_requirement_id=service_requirement_id, upload_image=self.validated_data['upload_image'])
 
-    class Meta:
-        model = TextField
-        service_requirement = ServiceRequirementSerializer()
-        fields = ['service_requirement', 'text']
-
-    # def save(self, validated_data):
-    #     # service_requirement_id = self.context['service_requirement_id']
-    #
-    #     service_requirement = ServiceRequirement.objects.get(service_id=self.context['service_id'])
-    #     service_requirement.title = self.validated_data['title']
-    #     service_requirement.details = self.validated_data['details']
-    #     service_requirement.hint = self.validated_data['hint']
-    #     service_requirement.save()
-    #
-    #     text = self.validated_data['text']
-    #
-    #     self.instance = TextField.objects.create(service_requirement=service_requirement.pk, text=text)
-    #     return self.instance
-
-class ImageFieldSerializer(serializers.ModelSerializer):
+    service_requirement = ServiceRequirementSerializer()
     class Meta:
         model = ImageField
-        fields = '__all__'
+
+        fields = ['service_requirement', 'upload_image']
 
     # def create(self, validated_data):
     #     service_requirement_id = self.context['service_requirement_id']
@@ -134,9 +121,9 @@ class ImageFieldSerializer(serializers.ModelSerializer):
 
 
 
-    class Meta:
-        model = ServiceRequirement
-        fields = ['title', 'details', 'hint', 'service_id', 'type']
+    # class Meta:
+    #     model = ServiceRequirement
+    #     fields = ['title', 'details', 'hint', 'service_id', 'type']
 
     # def create(self, validated_data):
     #     service_id = self.context['service_id']

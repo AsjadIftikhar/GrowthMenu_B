@@ -107,11 +107,11 @@ def user_directory_path(instance, filename):
 
 
 class FileField(Field):
-    upload_file = models.FileField(upload_to=user_directory_path)
+    upload_file = models.FileField(upload_to='store/files')
 
 
 class ImageField(Field):
-    upload_image = models.ImageField(upload_to=user_directory_path)
+    upload_image = models.ImageField(upload_to='store/images')
 
 
 pre_save.connect(Order.pre_save, sender=Order)
