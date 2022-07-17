@@ -90,14 +90,17 @@ class ServiceRequirement(models.Model):
 
 
 class Field(models.Model):
-    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True, related_name="%(class)s")
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True, related_name="%(class)s")
+
 
     class Meta:
         abstract = True
 
 
 class TextField(Field):
+    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+                                               related_name="text_field")
+    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+                                            related_name="text_field")
     text = models.CharField(max_length=1000, null=True)
 
 
@@ -107,10 +110,18 @@ def user_directory_path(instance, filename):
 
 
 class FileField(Field):
+    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+                                               related_name="file_field")
+    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+                                            related_name="file_field")
     upload_file = models.FileField(upload_to='store/files', null=True)
 
 
 class ImageField(Field):
+    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+                                               related_name="image_field")
+    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+                                            related_name="image_field")
     upload_image = models.ImageField(upload_to='store/images', null=True)
 
 

@@ -114,6 +114,16 @@ class ServiceRequirementViewSet(ModelViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
+    # def get_serializer_class(self):
+    #
+    #     if self.request.method == 'POST':
+    #         return ServiceRequirementSerializer
+    #     if self.request.method == 'GET':
+    #         for requirement in self.queryset:
+    #             # print(requirement)
+    #             if requirement.type == 'textField':
+    #                 return TextFieldSerializer
+    #     return ServiceRequirementSerializer
 
     # def create(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data, many=isinstance(request.data, list))
@@ -187,9 +197,8 @@ class ServiceRequirementViewSet(ModelViewSet):
     #     print("get_serializer")
     #     return super(ServiceRequirementViewSet, self).get_serializer(*args, **kwargs)
 
-    # def get_queryset(self):
-    #     print("get_queryset")
-    #     return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
+    def get_queryset(self):
+        return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
 
     # def get_serializer_context(self):
     #     print(self.)

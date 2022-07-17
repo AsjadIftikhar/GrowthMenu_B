@@ -26,7 +26,7 @@ class ServiceDescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceDescription
         service_id = serializers.IntegerField(read_only=True)
-        fields = ['id', 'text']
+        fields = ['id', 'text', 'service_id']
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -59,6 +59,14 @@ class CartSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TextFieldSerializer(serializers.ModelSerializer):
+
+
+
+    class Meta:
+        model = TextField
+        service_requirement_id = serializers.IntegerField(read_only=True)
+        fields = ['text', 'service_requirement_id']
 class ServiceRequirementSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
@@ -85,24 +93,13 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
 
         return self.instance
 
-
+    text_field = TextFieldSerializer(read_only=True)
     class Meta:
         model = ServiceRequirement
-        fields = ['service_id', 'id', 'label', 'type']
+        fields = ['service_id', 'id', 'label', 'type', 'text_field']
 
 
-class TextFieldSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        service_requirement_id = self.context['service_requirement_id']
-        return TextField.objects.create(service_requirement_id=service_requirement_id, text=self.validated_data['text'])
-
-    service_requirement = ServiceRequirementSerializer(read_only=True)
-
-    class Meta:
-        model = TextField
-
-        fields = ['service_requirement', 'text']
 
 
 class ImageFieldSerializer(serializers.ModelSerializer):
