@@ -15,7 +15,7 @@ service_description_router.register('description', ServiceDescriptionViewSet, ba
 # service_requirement_router.register('requirement', ServiceRequirementViewSet, basename='service-requirement')
 
 service_requirement_router = routers.NestedDefaultRouter(router, 'service', lookup='service')
-service_requirement_router.register('requirement', RequirementFieldViewSet, basename='service-requirement')
+service_requirement_router.register('requirement', ServiceRequirementViewSet, basename='service-requirement')
 
 faq_router = routers.NestedDefaultRouter(service_description_router, 'description', lookup='description')
 faq_router.register('faq', ServiceRequirementViewSet, basename='faq')

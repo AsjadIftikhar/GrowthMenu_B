@@ -1,3 +1,5 @@
+from rest_framework import status
+
 from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement, FAQ, TextField, ImageField, Field
 from api.serializers.order import OrderSerializer, CartSerializer, ServiceSerializer, ServiceDescriptionSerializer, \
     ServiceRequirementSerializer, FAQSerializer, TextFieldSerializer, ImageFieldSerializer, FieldSerializer
@@ -109,16 +111,77 @@ class ServiceDescriptionViewSet(ModelViewSet):
 
 class ServiceRequirementViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    # queryset = ServiceRequirement.objects.all()
+    queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
-    def get_queryset(self):
-        # print(self.kwargs)
-        return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
-    
-    def get_serializer_context(self):
-        # print(self.kwargs)
-        return {'service_id': self.kwargs['service_pk']}
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, many=isinstance(request.data, list))
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     ###
+    #     # First we need to iterate over the list o items
+    #     ###
+    #     if isinstance(request.data, list):
+    #         for requirement in serializer.validated_data:
+    #             print(requirement)
+    #             # Try to get proportion from database for selected user
+    #             # try:
+    #             #     service_requirement = ServiceRequirement.objects.get(service_id=self.kwargs['service_pk'])
+    #             #     service_requirement.save()
+    #             # # If it is not in the model, then we should create it
+    #             # except ServiceRequirement.DoesNotExist:
+    #             service_requirement = ServiceRequirement.objects.create(service_id=self.kwargs['service_pk'], title=requirement["title"], details=requirement["details"],
+    #                                                           hint=requirement["hint"], type=requirement["type"])
+    #             service_requirement.save()
+    #     else:
+    #         self.perform_create(serializer)
+    #
+    #
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+    def create(self, request, *args, **kwargs):
+        # print(self.request.data[0])
+
+        if isinstance(request.data, list):
+            for requirement in self.request.data:
+                if requirement['type'] == 'text':
+                    context = {
+                        'service_id': self.kwargs['service_pk'],
+                        'text': requirement['text']
+                    }
+                serializer = self.get_serializer(data=requirement, context=context, many=False)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+        else:
+            if self.request.data['type'] == 'text':
+                context = {
+                    'service_id': self.kwargs['service_pk'],
+                    'text': self.request.data['text']
+                }
+            serializer = self.get_serializer(data=request.data, context=context, many=False)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    # def get_serializer(self, *args, **kwargs):
+    #     """ if an array is passed, set serializer to many """
+    #     if isinstance(kwargs.get('data', {}), list):
+    #         kwargs['many'] = True
+    #     print("get_serializer")
+    #     return super(ServiceRequirementViewSet, self).get_serializer(*args, **kwargs)
+
+    # def get_queryset(self):
+    #     print("get_queryset")
+    #     return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
+
+    # def get_serializer_context(self):
+    #     print(self.)
+    #     return {'service_id': self.kwargs['service_pk']}
 
 
 class FAQViewSet(ModelViewSet):
