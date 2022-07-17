@@ -147,20 +147,32 @@ class ServiceRequirementViewSet(ModelViewSet):
 
         if isinstance(request.data, list):
             for requirement in self.request.data:
-                if requirement['type'] == 'text':
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'text': requirement['text']
-                    }
+                if requirement['type'] == 'textField':
+                    if 'text' in requirement:
+                        context = {
+                            'service_id': self.kwargs['service_pk'],
+                            'text': requirement['text']
+                        }
+                    else:
+                        context = {
+                            'service_id': self.kwargs['service_pk'],
+                            'text': ''
+                        }
                 serializer = self.get_serializer(data=requirement, context=context, many=False)
                 serializer.is_valid(raise_exception=True)
                 self.perform_create(serializer)
         else:
-            if self.request.data['type'] == 'text':
-                context = {
-                    'service_id': self.kwargs['service_pk'],
-                    'text': self.request.data['text']
-                }
+            if self.request.data['type'] == 'textField':
+                if 'text' in self.request.data:
+                    context = {
+                        'service_id': self.kwargs['service_pk'],
+                        'text': self.request.data['text']
+                    }
+                else:
+                    context = {
+                        'service_id': self.kwargs['service_pk'],
+                        'text': ''
+                    }
             serializer = self.get_serializer(data=request.data, context=context, many=False)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)

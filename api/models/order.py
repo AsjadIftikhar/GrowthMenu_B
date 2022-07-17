@@ -83,9 +83,9 @@ class FAQ(models.Model):
 
 class ServiceRequirement(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_requirement")
-    title = models.CharField(max_length=255)
-    details = models.TextField()
-    hint = models.CharField(max_length=255)
+    label = models.CharField(max_length=255)
+    # details = models.TextField()
+    # hint = models.CharField(max_length=255)
     type = models.CharField(max_length=255, null=True)
 
 
@@ -98,7 +98,7 @@ class Field(models.Model):
 
 
 class TextField(Field):
-    text = models.CharField(max_length=1000)
+    text = models.CharField(max_length=1000, null=True)
 
 
 def user_directory_path(instance, filename):
@@ -107,11 +107,11 @@ def user_directory_path(instance, filename):
 
 
 class FileField(Field):
-    upload_file = models.FileField(upload_to='store/files')
+    upload_file = models.FileField(upload_to='store/files', null=True)
 
 
 class ImageField(Field):
-    upload_image = models.ImageField(upload_to='store/images')
+    upload_image = models.ImageField(upload_to='store/images', null=True)
 
 
 pre_save.connect(Order.pre_save, sender=Order)

@@ -63,9 +63,9 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         service_id = self.context['service_id']
-        title = self.validated_data['title']
-        details = self.validated_data['details']
-        hint = self.validated_data['hint']
+        label = self.validated_data['label']
+        # details = self.validated_data['details']
+        # hint = self.validated_data['hint']
         type = self.validated_data['type']
         # try:
         #     service_requirement = ServiceRequirement.objects.get(service_id=service_id)
@@ -76,10 +76,9 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
         #     service_requirement.save()
         #     self.instance = service_requirement
         # except ServiceRequirement.DoesNotExist:
-        self.instance = ServiceRequirement.objects.create(service_id=service_id, title=title, details=details,
-                                                          hint=hint, type=type)
+        self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
 
-        if type == 'text':
+        if type == 'textField':
             # print(self.validated_data['text'])
             text_field = TextField.objects.create(service_requirement_id=self.instance.pk, text=self.context['text'])
             text_field.save()
@@ -89,7 +88,7 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServiceRequirement
-        fields = ['service_id', 'id', 'title', 'details', 'hint', 'type']
+        fields = ['service_id', 'id', 'label', 'type']
 
 
 class TextFieldSerializer(serializers.ModelSerializer):
