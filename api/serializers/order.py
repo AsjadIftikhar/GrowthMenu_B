@@ -71,7 +71,7 @@ class TextFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = TextField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['id', 'text', 'service_requirement_id']
+        fields = ['text', 'service_requirement_id']
 
 
 class ImageFieldSerializer(serializers.ModelSerializer):
@@ -86,7 +86,7 @@ class ImageFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['id', 'upload_image', 'service_requirement_id']
+        fields = ['upload_image', 'service_requirement_id']
 
 
 class FileFieldSerializer(serializers.ModelSerializer):
@@ -102,7 +102,7 @@ class FileFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['id', 'upload_file', 'service_requirement_id']
+        fields = ['upload_file', 'service_requirement_id']
 
 class ServiceRequirementSerializer(serializers.ModelSerializer):
 
@@ -153,7 +153,7 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
     file_field = FileFieldSerializer(read_only=True)
     class Meta:
         model = ServiceRequirement
-        fields = ['service_id', 'id', 'label', 'type', 'text_field', 'image_field', 'file_field']
+        fields = ['id', 'label', 'type', 'text_field', 'image_field', 'file_field']
 
 
 

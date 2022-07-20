@@ -111,11 +111,12 @@ class ServiceDescriptionViewSet(ModelViewSet):
 
 class ServiceRequirementViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = ServiceRequirement.objects.all()
+    # queryset = ServiceRequirement.objects.all()
     # serializer_class = ServiceRequirementSerializer
 
     # def update(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data, context={'service_requirement_id': self.kwargs['pk']}, many=False)
+    #
     #     serializer.is_valid(raise_exception=True)
     #     self.perform_create(serializer)
     #
@@ -220,6 +221,9 @@ class ServiceRequirementViewSet(ModelViewSet):
     def get_serializer_context(self):
         if self.request.method == 'PUT':
             return {'service_requirement_id': self.kwargs['pk']}
+        context = super(ServiceRequirementViewSet, self).get_serializer_context()
+        return context
+
 
 
 class FAQViewSet(ModelViewSet):
