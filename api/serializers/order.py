@@ -112,7 +112,7 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
                 file_field.save()
 
             self.instance = service_requirement
-        except ServiceRequirement.DoesNotExist:
+        except:
 
             self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
 
