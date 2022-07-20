@@ -60,29 +60,49 @@ class CartSerializer(serializers.ModelSerializer):
 
 class TextFieldSerializer(serializers.ModelSerializer):
 
+    def update(self, instance, validated_data):
+        text_field = TextField.objects.get(service_requirement_id=self.context["service_requirement_id"])
+        text_field.service_requirement.pk = self.context["service_requirement_id"]
+        text_field.text = self.validated_data['text']
+        text_field.save()
+        self.instance = ServiceRequirement.objects.get(id=self.context["service_requirement_id"])
+        return self.instance
 
     class Meta:
         model = TextField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['text', 'service_requirement_id']
+        fields = ['id', 'text', 'service_requirement_id']
 
 
 class ImageFieldSerializer(serializers.ModelSerializer):
 
+    def update(self, instance, validated_data):
+        image_field = ImageField.objects.get(service_requirement_id=self.context["service_requirement_id"])
+        image_field.upload_image = self.validated_data['upload_image']
+        image_field.save()
+        self.instance = ServiceRequirement.objects.get(id=self.context["service_requirement_id"])
+        return self.instance
 
     class Meta:
         model = ImageField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['upload_image', 'service_requirement_id']
+        fields = ['id', 'upload_image', 'service_requirement_id']
 
 
 class FileFieldSerializer(serializers.ModelSerializer):
 
+    def update(self, instance, validated_data):
+        file_field = FileField.objects.get(service_requirement_id=self.context["service_requirement_id"])
+        file_field.service_requirement.pk = self.context["service_requirement_id"]
+        file_field.upload_file = self.validated_data['upload_file']
+        file_field.save()
+        self.instance = ServiceRequirement.objects.get(id=self.context["service_requirement_id"])
+        return self.instance
 
     class Meta:
         model = FileField
         service_requirement_id = serializers.IntegerField(read_only=True)
-        fields = ['upload_file', 'service_requirement_id']
+        fields = ['id', 'upload_file', 'service_requirement_id']
 
 class ServiceRequirementSerializer(serializers.ModelSerializer):
 

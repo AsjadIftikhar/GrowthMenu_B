@@ -3,7 +3,7 @@ from rest_framework import status
 from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement, FAQ, TextField, ImageField, \
     Field
 from api.serializers.order import OrderSerializer, CartSerializer, ServiceSerializer, ServiceDescriptionSerializer, \
-    ServiceRequirementSerializer, FAQSerializer, TextFieldSerializer, ImageFieldSerializer
+    ServiceRequirementSerializer, FAQSerializer, TextFieldSerializer, ImageFieldSerializer, FileFieldSerializer
 from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
@@ -112,100 +112,15 @@ class ServiceDescriptionViewSet(ModelViewSet):
 class ServiceRequirementViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ServiceRequirement.objects.all()
-    serializer_class = ServiceRequirementSerializer
+    # serializer_class = ServiceRequirementSerializer
 
-    def update(self, request, *args, **kwargs):
-
-        if isinstance(request.data, list):
-            for requirement in self.request.data:
-                if requirement['type'] == 'textField':
-                    if 'text' in requirement:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id':self.kwargs['pk'],
-                            'text': requirement['text']
-                        }
-                    else:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id': self.kwargs['pk'],
-                            'text': ''
-                        }
-                if requirement['type'] == 'imageField':
-                    if 'upload_image' in requirement:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id': self.kwargs['pk'],
-                            'upload_image': requirement['upload_image']
-                        }
-                    else:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id': self.kwargs['pk'],
-                            'upload_image': ''
-                        }
-                if requirement['type'] == 'fileField':
-                    if 'upload_file' in requirement:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id': self.kwargs['pk'],
-                            'upload_file': requirement['upload_file']
-                        }
-                    else:
-                        context = {
-                            'service_id': self.kwargs['service_pk'],
-                            'service_requirement_id': self.kwargs['pk'],
-                            'upload_file': ''
-                        }
-                serializer = self.get_serializer(data=requirement, context=context, many=False)
-                serializer.is_valid(raise_exception=True)
-                self.perform_create(serializer)
-        else:
-            if self.request.data['type'] == 'textField':
-                if 'text' in self.request.data:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'text': self.request.data['text']
-                    }
-                else:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'text': ''
-                    }
-            if self.request.data['type'] == 'imageField':
-                if 'upload_image' in self.request.data:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'upload_image': self.request.data['upload_image']
-                    }
-                else:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'upload_image': ''
-                    }
-            if self.request.data['type'] == 'fileField':
-                if 'upload_file' in self.request.data:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'upload_file': self.request.data['upload_file']
-                    }
-                else:
-                    context = {
-                        'service_id': self.kwargs['service_pk'],
-                        'service_requirement_id': self.kwargs['pk'],
-                        'upload_file': ''
-                    }
-            serializer = self.get_serializer(data=request.data, context=context, many=False)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    # def update(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={'service_requirement_id': self.kwargs['pk']}, many=False)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def create(self, request, *args, **kwargs):
 
@@ -288,19 +203,23 @@ class ServiceRequirementViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    # def get_serializer(self, *args, **kwargs):
-    #     """ if an array is passed, set serializer to many """
-    #     if isinstance(kwargs.get('data', {}), list):
-    #         kwargs['many'] = True
-    #     print("get_serializer")
-    #     return super(ServiceRequirementViewSet, self).get_serializer(*args, **kwargs)
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            service_requirement = ServiceRequirement.objects.get(id=self.kwargs['pk'])
+            if service_requirement.type == 'textField':
+                return TextFieldSerializer
+            if service_requirement.type == 'imageField':
+                return ImageFieldSerializer
+            if service_requirement.type == 'fileField':
+                return FileFieldSerializer
+        return ServiceRequirementSerializer
 
     def get_queryset(self):
         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
 
-    # def get_serializer_context(self):
-    #     print(self.)
-    #     return {'service_id': self.kwargs['service_pk']}
+    def get_serializer_context(self):
+        if self.request.method == 'PUT':
+            return {'service_requirement_id': self.kwargs['pk']}
 
 
 class FAQViewSet(ModelViewSet):

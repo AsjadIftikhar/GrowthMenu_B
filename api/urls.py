@@ -1,5 +1,7 @@
 from rest_framework_nested import routers
 from api.views.order import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register('orders', OrderViewSet, basename='orders')
@@ -22,3 +24,8 @@ faq_router.register('faq', ServiceRequirementViewSet, basename='faq')
 
 # URLConf
 urlpatterns = router.urls + service_description_router.urls + service_requirement_router.urls + faq_router.urls
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_URL)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
