@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement, FAQ, TextField, ImageField, \
-    Field
+from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRequirement, FAQ, TextField, ImageField, FileField
 
 
 class ServiceDescriptionSerializer(serializers.ModelSerializer):
@@ -62,77 +61,85 @@ class CartSerializer(serializers.ModelSerializer):
 class TextFieldSerializer(serializers.ModelSerializer):
 
 
-
     class Meta:
         model = TextField
         service_requirement_id = serializers.IntegerField(read_only=True)
         fields = ['text', 'service_requirement_id']
+
+
+class ImageFieldSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = ImageField
+        service_requirement_id = serializers.IntegerField(read_only=True)
+        fields = ['upload_image', 'service_requirement_id']
+
+
+class FileFieldSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = FileField
+        service_requirement_id = serializers.IntegerField(read_only=True)
+        fields = ['upload_file', 'service_requirement_id']
+
 class ServiceRequirementSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         service_id = self.context['service_id']
         label = self.validated_data['label']
-        # details = self.validated_data['details']
-        # hint = self.validated_data['hint']
-        type = self.validated_data['type']
-        # try:
-        #     service_requirement = ServiceRequirement.objects.get(service_id=service_id)
-        #     service_requirement.title = title
-        #     service_requirement.details = details
-        #     service_requirement.hint = hint
-        #     service_requirement.type = type
-        #     service_requirement.save()
-        #     self.instance = service_requirement
-        # except ServiceRequirement.DoesNotExist:
-        self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
 
-        if type == 'textField':
-            # print(self.validated_data['text'])
-            text_field = TextField.objects.create(service_requirement_id=self.instance.pk, text=self.context['text'])
-            text_field.save()
+        type = self.validated_data['type']
+
+        try:
+            service_requirement = ServiceRequirement.objects.get(id=self.context['service_requirement_id'])
+            service_requirement.label = label
+            service_requirement.type = type
+            service_requirement.save()
+
+            if type == 'textField':
+                text_field = TextField.objects.get(service_requirement_id=service_requirement.pk)
+                text_field.text = self.context['text']
+                text_field.save()
+            if type == 'imageField':
+                image_field = ImageField.objects.get(service_requirement_id=service_requirement.pk)
+                image_field.upload_image = self.context['upload_image']
+                image_field.save()
+            if type == 'fileField':
+                file_field = FileField.objects.get(service_requirement_id=service_requirement.pk)
+                file_field.upload_file = self.context['upload_file']
+                file_field.save()
+
+            self.instance = service_requirement
+        except ServiceRequirement.DoesNotExist:
+
+            self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
+
+            if type == 'textField':
+                text_field = TextField.objects.create(service_requirement_id=self.instance.pk, text=self.context['text'])
+                text_field.save()
+            if type == 'imageField':
+                image_field = ImageField.objects.create(service_requirement_id=self.instance.pk, upload_image=self.context['upload_image'])
+                image_field.save()
+            if type == 'fileField':
+                file_field = FileField.objects.create(service_requirement_id=self.instance.pk, upload_file=self.context['upload_file'])
+                file_field.save()
 
         return self.instance
 
     text_field = TextFieldSerializer(read_only=True)
+    image_field = ImageFieldSerializer(read_only=True)
+    file_field = FileFieldSerializer(read_only=True)
     class Meta:
         model = ServiceRequirement
-        fields = ['service_id', 'id', 'label', 'type', 'text_field']
+        fields = ['service_id', 'id', 'label', 'type', 'text_field', 'image_field', 'file_field']
 
 
 
 
 
-class ImageFieldSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        service_requirement_id = self.context['service_requirement_id']
-        # service_requirement = ServiceRequirement.objects.get(id = service_requirement_id)
-        # service_requirement.title = self.validated_data['service_requirement']['title']
-        # service_requirement.details = self.validated_data['service_requirement']['details']
-        # service_requirement.hint = self.validated_data['service_requirement']['hint']
-        # service_requirement.type = self.validated_data['service_requirement']['type']
-        return ImageField.objects.create(service_requirement_id=service_requirement_id,
-                                         upload_image=self.validated_data['upload_image'])
-
-    service_requirement = ServiceRequirementSerializer()
-
-    class Meta:
-        model = ImageField
-
-        fields = ['service_requirement', 'upload_image']
-
-    # def create(self, validated_data):
-    #     service_requirement_id = self.context['service_requirement_id']
-    #     return ImageField.objects.create(service_requirement=service_requirement_id, **validated_data)
-
-    # class Meta:
-    #     model = ServiceRequirement
-    #     fields = ['title', 'details', 'hint', 'service_id', 'type']
-
-    # def create(self, validated_data):
-    #     service_id = self.context['service_id']
-    #     # print(service_id)
-    #     return ServiceRequirement.objects.create(service_id=service_id, **validated_data)
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -145,7 +152,7 @@ class FAQSerializer(serializers.ModelSerializer):
         return FAQ.objects.create(service_description_id=service_description_id, **validated_data)
 
 
-class FieldSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Field
-        fields = '__all__'
+# class FieldSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Field
+#         fields = '__all__'
