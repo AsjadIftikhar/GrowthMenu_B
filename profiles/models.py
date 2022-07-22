@@ -36,6 +36,8 @@ class Customer(models.Model):
 
     # Link to default user model
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
 
     def __str__(self):
         return self.user.username
