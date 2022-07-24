@@ -33,7 +33,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ['id', 'title', 'service_description']
+        fields = ['id', 'title', 'src', 'service_description']
 
 
 class OrderSerializer(serializers.ModelSerializer):
