@@ -112,39 +112,17 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
 
         type = self.validated_data['type']
 
-        try:
-            service_requirement = ServiceRequirement.objects.get(id=self.context['service_requirement_id'])
-            service_requirement.label = label
-            service_requirement.type = type
-            service_requirement.save()
+        self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
 
-            if type == 'textField':
-                text_field = TextField.objects.get(service_requirement_id=service_requirement.pk)
-                text_field.text = self.context['text']
-                text_field.save()
-            if type == 'imageField':
-                image_field = ImageField.objects.get(service_requirement_id=service_requirement.pk)
-                image_field.upload_image = self.context['upload_image']
-                image_field.save()
-            if type == 'fileField':
-                file_field = FileField.objects.get(service_requirement_id=service_requirement.pk)
-                file_field.upload_file = self.context['upload_file']
-                file_field.save()
-
-            self.instance = service_requirement
-        except:
-
-            self.instance = ServiceRequirement.objects.create(service_id=service_id, label=label, type=type)
-
-            if type == 'textField':
-                text_field = TextField.objects.create(service_requirement_id=self.instance.pk, text=self.context['text'])
-                text_field.save()
-            if type == 'imageField':
-                image_field = ImageField.objects.create(service_requirement_id=self.instance.pk, upload_image=self.context['upload_image'])
-                image_field.save()
-            if type == 'fileField':
-                file_field = FileField.objects.create(service_requirement_id=self.instance.pk, upload_file=self.context['upload_file'])
-                file_field.save()
+        if type == 'textField':
+            text_field = TextField.objects.create(service_requirement_id=self.instance.pk, text=self.context['text'])
+            text_field.save()
+        if type == 'imageField':
+            image_field = ImageField.objects.create(service_requirement_id=self.instance.pk, upload_image=self.context['upload_image'])
+            image_field.save()
+        if type == 'fileField':
+            file_field = FileField.objects.create(service_requirement_id=self.instance.pk, upload_file=self.context['upload_file'])
+            file_field.save()
 
         return self.instance
 
@@ -154,11 +132,6 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceRequirement
         fields = ['id', 'label', 'type', 'text_field', 'image_field', 'file_field']
-
-
-
-
-
 
 
 
@@ -172,7 +145,3 @@ class FAQSerializer(serializers.ModelSerializer):
         return FAQ.objects.create(service_description_id=service_description_id, **validated_data)
 
 
-# class FieldSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Field
-#         fields = '__all__'
