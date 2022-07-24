@@ -8,15 +8,9 @@ from django.db.models.signals import pre_save, post_init
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
-class Service(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=255)
-    # order = models.ForeignKey(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
-
 
 class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    service = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
     due_at = models.DateField()
     STATUS = [
         ('In Progress', 'In Progress'),
@@ -66,7 +60,11 @@ class Order(models.Model):
         instance.previous_status = instance.status_category
 
 
-
+class Service(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=255)
+    src = models.CharField(max_length=255, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
 
 
 class ServiceDescription(models.Model):
@@ -90,8 +88,6 @@ class ServiceRequirement(models.Model):
 
 
 class Field(models.Model):
-
-
     class Meta:
         abstract = True
 
