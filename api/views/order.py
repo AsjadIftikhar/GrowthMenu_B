@@ -135,10 +135,10 @@ class FAQViewSet(ModelViewSet):
     serializer_class = FAQSerializer
 
     def get_queryset(self):
-        return FAQ.objects.filter(service_description_id=self.kwargs['service_description_pk'])
+        return FAQ.objects.filter(service_id=self.kwargs['service_pk'])
 
     def get_serializer_context(self):
-        return {'service_description_id': self.kwargs['service_description_pk']}
+        return {'service_id': self.kwargs['service_pk']}
 
 #
 # class RequirementFieldViewSet(ModelViewSet):

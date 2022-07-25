@@ -4,23 +4,25 @@ from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRe
 
 class ServiceDescriptionSerializer(serializers.ModelSerializer):
 
-    def save(self, **kwargs):
+    # def save(self, **kwargs):
+    #     service_id = self.context['service_id']
+    #     text = self.validated_data['text']
+    #
+    #     try:
+    #         # updating existing Description
+    #         service_description = ServiceDescription.objects.get(service_id=service_id)
+    #         service_description.text = text
+    #         service_description.save()
+    #         self.instance = service_description
+    #     except ServiceDescription.DoesNotExist:
+    #         # Creating new description
+    #         self.instance = ServiceDescription.objects.create(service_id=service_id, **self.validated_data)
+    #
+    #     return self.instance
+
+    def create(self, validated_data):
         service_id = self.context['service_id']
-        title = self.validated_data['title']
-        text = self.validated_data['text']
-
-        try:
-            # updating existing Description
-            service_description = ServiceDescription.objects.get(service_id=service_id)
-            service_description.title = title
-            service_description.text = text
-            service_description.save()
-            self.instance = service_description
-        except ServiceDescription.DoesNotExist:
-            # Creating new description
-            self.instance = ServiceDescription.objects.create(service_id=service_id, **self.validated_data)
-
-        return self.instance
+        return ServiceDescription.objects.create(service_id=service_id, **validated_data)
 
     class Meta:
         model = ServiceDescription
@@ -28,12 +30,23 @@ class ServiceDescriptionSerializer(serializers.ModelSerializer):
         fields = ['id', 'text', 'service_id']
 
 
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        service_id = serializers.IntegerField(read_only=True)
+        fields = ['id', 'question', 'answer', 'service_id']
+
+    def create(self, validated_data):
+        service_id = self.context['service_id']
+        return FAQ.objects.create(service_id=service_id, **validated_data)
+
 class ServiceSerializer(serializers.ModelSerializer):
     service_description = ServiceDescriptionSerializer(read_only=True)
+    service_faq = FAQSerializer(read_only=True, many=True)
 
     class Meta:
         model = Service
-        fields = ['id', 'title', 'src', 'service_description']
+        fields = ['id', 'title', 'src', 'service_description', 'service_faq']
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -134,14 +147,5 @@ class ServiceRequirementSerializer(serializers.ModelSerializer):
         fields = ['id', 'label', 'type', 'text_field', 'image_field', 'file_field']
 
 
-
-class FAQSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FAQ
-        fields = ['question', 'answer', 'service_description_id']
-
-    def create(self, validated_data):
-        service_description_id = self.context['service_description_id']
-        return FAQ.objects.create(service_description_id=service_description_id, **validated_data)
 
 

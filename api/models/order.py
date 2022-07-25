@@ -74,7 +74,7 @@ class ServiceDescription(models.Model):
 
 
 class FAQ(models.Model):
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True, related_name='faq')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_faq')
     question = models.CharField(max_length=255, null=True)
     answer = models.CharField(max_length=1000, null=True)
 
