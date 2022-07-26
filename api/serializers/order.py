@@ -4,25 +4,25 @@ from api.models.order import Order, Cart, Service, ServiceDescription, ServiceRe
 
 class ServiceDescriptionSerializer(serializers.ModelSerializer):
 
-    # def save(self, **kwargs):
-    #     service_id = self.context['service_id']
-    #     text = self.validated_data['text']
-    #
-    #     try:
-    #         # updating existing Description
-    #         service_description = ServiceDescription.objects.get(service_id=service_id)
-    #         service_description.text = text
-    #         service_description.save()
-    #         self.instance = service_description
-    #     except ServiceDescription.DoesNotExist:
-    #         # Creating new description
-    #         self.instance = ServiceDescription.objects.create(service_id=service_id, **self.validated_data)
-    #
-    #     return self.instance
-
-    def create(self, validated_data):
+    def save(self, **kwargs):
         service_id = self.context['service_id']
-        return ServiceDescription.objects.create(service_id=service_id, **validated_data)
+        text = self.validated_data['text']
+
+        try:
+            # updating existing Description
+            service_description = ServiceDescription.objects.get(service_id=service_id)
+            service_description.text = text
+            service_description.save()
+            self.instance = service_description
+        except ServiceDescription.DoesNotExist:
+            # Creating new description
+            self.instance = ServiceDescription.objects.create(service_id=service_id, **self.validated_data)
+
+        return self.instance
+
+    # def create(self, validated_data):
+    #     service_id = self.context['service_id']
+    #     return ServiceDescription.objects.create(service_id=service_id, **validated_data)
 
     class Meta:
         model = ServiceDescription
@@ -36,9 +36,27 @@ class FAQSerializer(serializers.ModelSerializer):
         service_id = serializers.IntegerField(read_only=True)
         fields = ['id', 'question', 'answer', 'service_id']
 
-    def create(self, validated_data):
+    # def create(self, validated_data):
+    #     service_id = self.context['service_id']
+    #     return FAQ.objects.create(service_id=service_id, **validated_data)
+
+    def save(self, **kwargs):
         service_id = self.context['service_id']
-        return FAQ.objects.create(service_id=service_id, **validated_data)
+        question = self.validated_data['question']
+        answer = self.validated_data['answer']
+
+        try:
+            # updating existing Description
+            faq = FAQ.objects.get(service_id=service_id)
+            faq.question = question
+            faq.answer = answer
+            faq.save()
+            self.instance = faq
+        except FAQ.DoesNotExist:
+            # Creating new description
+            self.instance = FAQ.objects.create(service_id=service_id, **self.validated_data)
+
+        return self.instance
 
 class ServiceSerializer(serializers.ModelSerializer):
     service_description = ServiceDescriptionSerializer(read_only=True)
