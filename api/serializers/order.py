@@ -40,24 +40,6 @@ class FAQSerializer(serializers.ModelSerializer):
         service_id = self.context['service_id']
         return FAQ.objects.create(service_id=service_id, **validated_data)
 
-    # def save(self, **kwargs):
-    #     service_id = self.context['service_id']
-    #     question = self.validated_data['question']
-    #     answer = self.validated_data['answer']
-    #
-    #     try:
-    #         # updating existing Description
-    #         faq = FAQ.objects.get(service_id=service_id)
-    #         faq.question = question
-    #         faq.answer = answer
-    #         faq.save()
-    #         self.instance = faq
-    #     except FAQ.DoesNotExist:
-    #         # Creating new description
-    #         self.instance = FAQ.objects.create(service_id=service_id, **self.validated_data)
-    #
-    #     return self.instance
-
 class ServiceSerializer(serializers.ModelSerializer):
     service_description = ServiceDescriptionSerializer(read_only=True)
     service_faq = FAQSerializer(read_only=True, many=True)
