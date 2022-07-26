@@ -64,7 +64,7 @@ class Service(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=255)
     src = models.CharField(max_length=255, null=True, blank=True)
-    order = models.ForeignKey(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
+    order = models.OneToOneField(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
 
 
 class ServiceDescription(models.Model):

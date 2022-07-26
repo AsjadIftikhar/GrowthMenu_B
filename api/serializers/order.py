@@ -59,7 +59,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return self.instance
 
-    # service = ServiceSerializer(read_only=True)
+    service = ServiceSerializer(read_only=True)
     class Meta:
         model = Order
         fields = ['service', 'status_category', 'overall_status_category', 'due_at', 'cart_id']
