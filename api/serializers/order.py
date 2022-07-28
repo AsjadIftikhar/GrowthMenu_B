@@ -20,9 +20,6 @@ class ServiceDescriptionSerializer(serializers.ModelSerializer):
 
         return self.instance
 
-    # def create(self, validated_data):
-    #     service_id = self.context['service_id']
-    #     return ServiceDescription.objects.create(service_id=service_id, **validated_data)
 
     class Meta:
         model = ServiceDescription

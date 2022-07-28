@@ -21,7 +21,6 @@ class OrderViewSet(ModelViewSet):
 
 
     def get_serializer_context(self):
-        # print(self.request.data['service'])
         (cart, created) = Cart.objects.get_or_create(customer_id=self.request.user.id)
         return {'cart_id': cart.id}
 
@@ -46,7 +45,6 @@ class ServiceViewSet(ModelViewSet):
 
 class ServiceDescriptionViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    # queryset = ServiceDescription.objects.all()
     serializer_class = ServiceDescriptionSerializer
 
     def get_queryset(self):
@@ -55,15 +53,12 @@ class ServiceDescriptionViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'service_id': self.kwargs['service_pk']}
 
-    # def get_serializer_class(self):
-    #     if self.request.data
-
 
 class ServiceRequirementViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-
+        # for a list in a single POST request
         if isinstance(request.data, list):
             for requirement in self.request.data:
                 if requirement['type'] == 'textField':
@@ -131,7 +126,6 @@ class ServiceRequirementViewSet(ModelViewSet):
 
 class FAQViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    # queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
 
     def get_queryset(self):
@@ -139,42 +133,3 @@ class FAQViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'service_id': self.kwargs['service_pk']}
-
-#
-# class RequirementFieldViewSet(ModelViewSet):
-#     permission_classes = [IsAuthenticated]
-#
-#     # (service_requirement, created) = ServiceRequirement.objects.get_or_create(customer_id=self.request.user.id)
-#
-#     def get_queryset(self):
-#
-#         # if self.request.method == 'POST':
-#         #     if self.request.data['type'] == 'text':
-#         #         return TextField.objects.filter(service_id=self.kwargs['service_pk'])
-#         #
-#         #     if self.request.data['type'] == 'image':
-#         #         return ImageField.objects.filter(service_id=self.kwargs['service_pk'])
-#
-#         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
-#
-#     # def get_serializer(self, *args, **kwargs):
-#     #     serializer_class = self.get_serializer_class()
-#     #     kwargs['context'] = self.get_serializer_context()
-#     #     return serializer_class(*args, **kwargs)
-#
-#     def get_serializer_class(self):
-#         if self.request.method == 'POST':
-#             if self.request.data['type'] == 'text':
-#                 return TextFieldSerializer
-#             return ImageFieldSerializer
-#         return ServiceRequirementSerializer
-#
-#     def get_serializer_context(self):
-#         (service_requirement, created) = ServiceRequirement.objects.get_or_create(service_id=self.kwargs['service_pk'])
-#         service_requirement.title = self.request.data['title']
-#         service_requirement.details = self.request.data['details']
-#         service_requirement.hint = self.request.data['hint']
-#         service_requirement.type = self.request.data['type']
-#         service_requirement.save()
-#
-#         return {'service_requirement_id': service_requirement.id, 'service_id': self.kwargs['service_pk']}
