@@ -1,17 +1,21 @@
 from datetime import datetime
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from profiles.models import Customer
 from django.db.models.signals import pre_save, post_init
 
 
 class Cart(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
 
 class Order(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    due_at = models.DateField()
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    placed_at = models.DateTimeField(auto_now_add=True)
+    due_at = models.DateTimeField()
     STATUS = [
         ('In Progress', 'In Progress'),
         ('Awaiting Brief', 'Awaiting Brief'),
@@ -57,18 +61,32 @@ class Order(models.Model):
     def remember_state(sender, instance, **kwargs):
         instance.previous_status = instance.status_category
 
-
 class Service(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=255)
     src = models.CharField(max_length=255, null=True, blank=True)
-    order = models.OneToOneField(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
+    description = models.TextField()
+    # order = models.OneToOneField(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name="orderitems")
+    # minimum quantity should be 1
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = [['order', 'service']]
 
 
-class ServiceDescription(models.Model):
-    service = models.OneToOneField(Service, on_delete=models.CASCADE, related_name="service_description")
+class Form(models.Model):
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name="forms")
 
-    text = models.TextField()
+
+
+# class ServiceDescription(models.Model):
+#     service = models.OneToOneField(Service, on_delete=models.CASCADE, related_name="service_description")
+#
+#     text = models.TextField()
 
 
 class FAQ(models.Model):
@@ -82,39 +100,39 @@ class ServiceRequirement(models.Model):
     label = models.CharField(max_length=255)
     type = models.CharField(max_length=255, null=True)
 
-
-class Field(models.Model):
-    class Meta:
-        abstract = True
-
-
-class TextField(Field):
-    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-                                               related_name="text_field")
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-                                            related_name="text_field")
-    text = models.CharField(max_length=1000, null=True)
-
-
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'user_{0}/{1}'.format(instance.user.id, filename)
-
-
-class FileField(Field):
-    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-                                               related_name="file_field")
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-                                            related_name="file_field")
-    upload_file = models.FileField(upload_to='store/files', null=True)
-
-
-class ImageField(Field):
-    service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-                                               related_name="image_field")
-    service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-                                            related_name="image_field")
-    upload_image = models.ImageField(upload_to='store/images', null=True)
+#
+# class Field(models.Model):
+#     class Meta:
+#         abstract = True
+#
+#
+# class TextField(Field):
+#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+#                                                related_name="text_field")
+#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+#                                             related_name="text_field")
+#     text = models.CharField(max_length=1000, null=True)
+#
+#
+# def user_directory_path(instance, filename):
+#     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+#     return 'user_{0}/{1}'.format(instance.user.id, filename)
+#
+#
+# class FileField(Field):
+#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+#                                                related_name="file_field")
+#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+#                                             related_name="file_field")
+#     upload_file = models.FileField(upload_to='store/files', null=True)
+#
+#
+# class ImageField(Field):
+#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
+#                                                related_name="image_field")
+#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
+#                                             related_name="image_field")
+#     upload_image = models.ImageField(upload_to='store/images', null=True)
 
 
 pre_save.connect(Order.pre_save, sender=Order)
