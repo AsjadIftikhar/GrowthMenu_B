@@ -1,21 +1,20 @@
-from datetime import datetime
-
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from profiles.models import Customer
-from django.db.models.signals import pre_save, post_init
+from api.models.base import BaseTimeStampedModel
+from api.models.services import Service
 
 
-class Cart(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    # customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+class Cart(BaseTimeStampedModel):
+    pass
 
 
-class Order(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    placed_at = models.DateTimeField(auto_now_add=True)
-    due_at = models.DateTimeField()
+class Order(BaseTimeStampedModel):
+    # todo Ali: complete the variable list
+    IN_PROGRESS = 'In Progress'
+    AWAITING_BRIEF = 'Awaiting Brief'
+
     STATUS = [
         ('In Progress', 'In Progress'),
         ('Awaiting Brief', 'Awaiting Brief'),
@@ -24,54 +23,25 @@ class Order(models.Model):
         ('Refund', 'Refund'),
         ('Canceled', 'Canceled'),
     ]
-    status_category = models.CharField(choices=STATUS, default='Awaiting Brief', max_length=100)
 
-    previous_status = None
+    # todo Ali: save method override
+    MAPPINGS = {
+        IN_PROGRESS: "Active"
+    }
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name="order")
 
-    OVERALL_STATUS = [
-        ('Active', 'Active'),
-        ('Completed', 'Completed'),
-        ('Canceled', 'Canceled'),
-    ]
-    overall_status_category = models.CharField(choices=OVERALL_STATUS, default='Active', max_length=100)
+    due_at = models.DateTimeField(null=True)
+    status = models.CharField(max_length=20, default="Active")
+    sub_status = models.CharField(choices=STATUS, default='Awaiting Brief', max_length=100)
+
+    def __str__(self):
+        return f"{self.customer.first_name}: {self.id}"
 
 
-    # Detect status change
-    @staticmethod
-    def pre_save(sender, instance, **kwargs):
-        if instance.previous_status != instance.status_category:
-
-            # ACTIVE
-            active_status_types = ['In Progress', 'Awaiting Brief', 'In Revision']
-
-            # COMPLETED
-            completed_status_types = ['Complete']
-
-            # CANCELED
-            canceled_status_types = ['Refund', 'Canceled']
-
-            if instance.status_category in active_status_types:
-                instance.overall_status_category = 'Active'
-            elif instance.status_category in completed_status_types:
-                instance.overall_status_category = 'Completed'
-            elif instance.status_category in canceled_status_types:
-                instance.overall_status_category = 'Canceled'
-
-    @staticmethod
-    def remember_state(sender, instance, **kwargs):
-        instance.previous_status = instance.status_category
-
-class Service(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=255)
-    src = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField()
-    # order = models.OneToOneField(Order, on_delete=models.DO_NOTHING, null=True, related_name="service")
-
-class OrderItem(models.Model):
+class OrderItem(BaseTimeStampedModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name="orderitems")
-    # minimum quantity should be 1
+    service = models.ForeignKey(Service, on_delete=models.PROTECT)
+
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
@@ -81,31 +51,6 @@ class OrderItem(models.Model):
 class Form(models.Model):
     order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name="forms")
 
-
-
-# class ServiceDescription(models.Model):
-#     service = models.OneToOneField(Service, on_delete=models.CASCADE, related_name="service_description")
-#
-#     text = models.TextField()
-
-
-class FAQ(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, related_name='service_faq')
-    question = models.CharField(max_length=255, null=True)
-    answer = models.CharField(max_length=1000, null=True)
-
-
-class ServiceRequirement(models.Model):
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_requirement")
-    label = models.CharField(max_length=255)
-    type = models.CharField(max_length=255, null=True)
-
-#
-# class Field(models.Model):
-#     class Meta:
-#         abstract = True
-#
-#
 # class TextField(Field):
 #     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
 #                                                related_name="text_field")
@@ -133,7 +78,3 @@ class ServiceRequirement(models.Model):
 #     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
 #                                             related_name="image_field")
 #     upload_image = models.ImageField(upload_to='store/images', null=True)
-
-
-pre_save.connect(Order.pre_save, sender=Order)
-post_init.connect(Order.remember_state, sender=Order)
