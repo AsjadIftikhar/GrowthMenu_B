@@ -6,36 +6,34 @@ from api.models.base import BaseTimeStampedModel
 from api.models.services import Service
 
 
-class Cart(BaseTimeStampedModel):
-    pass
-
-
 class Order(BaseTimeStampedModel):
     # todo Ali: complete the variable list
     IN_PROGRESS = 'In Progress'
     AWAITING_BRIEF = 'Awaiting Brief'
+    IN_REVISION = 'In Revision'
+    COMPLETE = 'Complete'
+    REFUND = 'Refund'
+    CANCELED = 'Canceled'
 
     STATUS = [
-        ('In Progress', 'In Progress'),
-        ('Awaiting Brief', 'Awaiting Brief'),
-        ('In Revision', 'In Revision'),
-        ('Complete', 'Complete'),
-        ('Refund', 'Refund'),
-        ('Canceled', 'Canceled'),
+        (IN_PROGRESS, IN_PROGRESS),
+        (AWAITING_BRIEF, AWAITING_BRIEF),
+        (IN_REVISION, IN_REVISION),
+        (COMPLETE, COMPLETE),
+        (REFUND, REFUND),
+        (CANCELED, CANCELED),
     ]
 
     # todo Ali: save method override
-    MAPPINGS = {
-        IN_PROGRESS: "Active"
-    }
+
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name="order")
 
     due_at = models.DateTimeField(null=True)
     status = models.CharField(max_length=20, default="Active")
-    sub_status = models.CharField(choices=STATUS, default='Awaiting Brief', max_length=100)
+    sub_status = models.CharField(choices=STATUS, default=AWAITING_BRIEF, max_length=100)
 
-    def __str__(self):
-        return f"{self.customer.first_name}: {self.id}"
+    # def __str__(self):
+    #     return f"{self.customer.first_name}: {self.id}"
 
 
 class OrderItem(BaseTimeStampedModel):

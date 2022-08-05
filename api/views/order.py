@@ -9,7 +9,6 @@ from api.models.order import (
 )
 from api.serializers.order import (
     OrderSerializer,
-    CartSerializer,
 )
 
 from profiles.models import Customer
@@ -31,14 +30,3 @@ class OrderViewSet(ModelViewSet):
         Order.objects.filter(customer_id=customer_id)
 
 
-class CartViewSet(CreateModelMixin, GenericViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = CartSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-
-        (customer_id, created) = Customer.objects.only('id').get_or_create(
-            user_id=user.id)
-
-        return Order.objects.filter(customer_id=customer_id)

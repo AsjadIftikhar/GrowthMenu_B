@@ -1,10 +1,9 @@
 from rest_framework import serializers
 
+from api.helpers import status_change
 from api.models.order import (
     Order,
     OrderItem,
-    Cart,
-    Service,
 )
 
 
@@ -21,16 +20,20 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'customer', 'due_at', 'created_at', 'sub_status', 'status', 'items']
 
+    def update(self, instance, validated_data):
+        if instance.sub_status != validated_data["sub_status"]:
+            validated_data["status"] = status_change(validated_data["sub_status"])
+        return super(OrderSerializer, self).update(instance, validated_data)
+
     def create(self, validated_data):
         # todo Whatever
-        super(OrderSerializer, self).create(validated_data)
+        return super(OrderSerializer, self).create(validated_data)
 
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
-
 
 #
 # class TextFieldSerializer(serializers.ModelSerializer):

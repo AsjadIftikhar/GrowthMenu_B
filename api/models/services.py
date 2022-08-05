@@ -19,7 +19,17 @@ class FAQ(BaseTimeStampedModel):
 
 class ServiceRequirement(BaseTimeStampedModel):
     # todo Ali: Convert Type into a Model Choice Field
+    TEXT_FIELD = 'textField'
+    IMAGE_FIELD = 'imageField'
+    FILE_FIELD = 'fileField'
+
+    TYPE = [
+        (TEXT_FIELD, TEXT_FIELD),
+        (IMAGE_FIELD, IMAGE_FIELD),
+        (FILE_FIELD, FILE_FIELD),
+    ]
+
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="service_requirement")
 
     label = models.CharField(max_length=255)
-    type = models.CharField(max_length=255, null=True)
+    type = models.CharField(choices=TYPE, max_length=255, null=True)
