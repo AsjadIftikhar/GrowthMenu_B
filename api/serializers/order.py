@@ -29,12 +29,6 @@ class OrderSerializer(serializers.ModelSerializer):
         # todo Whatever
         return super(OrderSerializer, self).create(validated_data)
 
-
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = '__all__'
-
 #
 # class TextFieldSerializer(serializers.ModelSerializer):
 #

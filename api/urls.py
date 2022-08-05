@@ -12,7 +12,7 @@ router.register('carts', CartViewSet)
 router.register('service', ServiceViewSet, basename='service')
 
 # Nested Routers
-cart_router = routers.NestedDefaultRouter(router, 'cart', lookup='cart')
+cart_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 cart_router.register('items', CartItemViewSet, basename='cart-items')
 
 faq_router = routers.NestedDefaultRouter(router, 'service', lookup='service')
