@@ -31,6 +31,7 @@ class ServiceRequirementViewSet(ModelViewSet):
     def get_queryset(self):
         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
 
+    # todo this is wrong correct it
     def get_serializer_class(self):
         return {'service_id': self.kwargs['pk']}
 
