@@ -24,7 +24,7 @@ class Order(BaseTimeStampedModel):
         (CANCELED, CANCELED),
     ]
 
-    # todo Ali: save method override
+    # todo Ali: save method override: Done
 
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name="order")
 
@@ -40,39 +40,26 @@ class OrderItem(BaseTimeStampedModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
 
-    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
-
-    class Meta:
-        unique_together = [['order', 'service']]
-
 
 class Form(models.Model):
-    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name="forms")
+    order_item = models.OneToOneField(OrderItem, on_delete=models.CASCADE, related_name="forms")
 
-# class TextField(Field):
-#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-#                                                related_name="text_field")
-#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-#                                             related_name="text_field")
-#     text = models.CharField(max_length=1000, null=True)
-#
-#
+
+class TextField(models.Model):
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, null=True, related_name="text_field")
+    text = models.CharField(max_length=1000, null=True)
+
+
 # def user_directory_path(instance, filename):
 #     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
 #     return 'user_{0}/{1}'.format(instance.user.id, filename)
-#
-#
-# class FileField(Field):
-#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-#                                                related_name="file_field")
-#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-#                                             related_name="file_field")
-#     upload_file = models.FileField(upload_to='store/files', null=True)
-#
-#
-# class ImageField(Field):
-#     service_requirement = models.OneToOneField(ServiceRequirement, on_delete=models.CASCADE, null=True,
-#                                                related_name="image_field")
-#     service_description = models.ForeignKey(ServiceDescription, on_delete=models.CASCADE, null=True,
-#                                             related_name="image_field")
-#     upload_image = models.ImageField(upload_to='store/images', null=True)
+
+
+class FileField(models.Model):
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, null=True, related_name="file_field")
+    upload_file = models.FileField(upload_to='store/files', null=True)
+
+
+class ImageField(models.Model):
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, null=True, related_name="image_field")
+    upload_image = models.ImageField(upload_to='store/images', null=True)
