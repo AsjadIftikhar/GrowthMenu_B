@@ -31,8 +31,8 @@ class ServiceRequirementViewSet(ModelViewSet):
     def get_queryset(self):
         return ServiceRequirement.objects.filter(service_id=self.kwargs['service_pk'])
 
-    def get_serializer_class(self):
-        return {'service_id': self.kwargs['pk']}
+    def get_serializer_context(self):
+        return {'service_id': self.kwargs['service_pk']}
 
 
 class FAQViewSet(ModelViewSet):
