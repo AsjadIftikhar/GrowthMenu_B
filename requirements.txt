@@ -16,7 +16,6 @@ djangorestframework==3.13.1
 djangorestframework-simplejwt==4.8.0
 djoser==2.1.0
 drf-nested-routers==0.93.4
-drf-yasg==1.20.0
 idna==3.3
 importlib-metadata==4.11.2
 inflection==0.5.1

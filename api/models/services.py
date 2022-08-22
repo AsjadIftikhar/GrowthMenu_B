@@ -5,8 +5,6 @@ from api.models.base import BaseTimeStampedModel
 
 class Service(BaseTimeStampedModel):
     title = models.CharField(max_length=255)
-
-    # todo It is a text field R&D for Rich Text/ Formatted Text
     description = models.TextField()
 
 
@@ -18,7 +16,6 @@ class FAQ(BaseTimeStampedModel):
 
 
 class ServiceRequirement(BaseTimeStampedModel):
-    # todo Ali: Convert Type into a Model Choice Field
     TEXT_FIELD = 'textField'
     IMAGE_FIELD = 'imageField'
     FILE_FIELD = 'fileField'

@@ -7,7 +7,6 @@ from api.models.services import Service
 
 
 class Order(BaseTimeStampedModel):
-    # todo Ali: complete the variable list
     IN_PROGRESS = 'In Progress'
     AWAITING_BRIEF = 'Awaiting Brief'
     IN_REVISION = 'In Revision'
@@ -24,16 +23,11 @@ class Order(BaseTimeStampedModel):
         (CANCELED, CANCELED),
     ]
 
-    # todo Ali: save method override: Done
-
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name="order")
 
     due_at = models.DateTimeField(null=True)
     status = models.CharField(max_length=20, default="Active")
     sub_status = models.CharField(choices=STATUS, default=AWAITING_BRIEF, max_length=100)
-
-    # def __str__(self):
-    #     return f"{self.customer.first_name}: {self.id}"
 
 
 class OrderItem(BaseTimeStampedModel):

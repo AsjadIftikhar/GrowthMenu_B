@@ -29,8 +29,6 @@ class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        # todo Profile Based Permission
-        # todo if user is an admin, return all orders
         user = self.request.user
 
         if user.is_staff:
@@ -58,9 +56,6 @@ class FormViewSet(ModelViewSet):
     def get_queryset(self):
         Form.objects.all()
 
-
-    # def get_serializer_context(self):
-    #     return {'order_items_id': self.request.data['order_item']}
 
 class TextFieldViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
